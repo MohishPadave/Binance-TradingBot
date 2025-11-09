@@ -37,12 +37,15 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
 # Initialize extensions
 # CORS configuration - allow frontend domains
+frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+allowed_origins = [
+    "http://localhost:3000",  # Local development
+    "https://*.vercel.app",   # Vercel deployments
+    frontend_url,             # Production frontend from env
+]
+
 CORS(app, 
-     origins=[
-         "http://localhost:3000",  # Local development
-         "https://*.vercel.app",   # Vercel deployments
-         "https://binance-tradingbot-production.up.railway.app",  # Backend itself
-     ],
+     origins=allowed_origins,
      supports_credentials=True,
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
