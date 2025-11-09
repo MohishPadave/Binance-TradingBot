@@ -23,10 +23,5 @@
       "dest": "frontend/$1"
     }
   ],
-  "env": {
-    "BINANCE_TESTNET_API_KEY": "@binance_testnet_api_key",
-    "BINANCE_TESTNET_API_SECRET": "@binance_testnet_api_secret",
-    "TELEGRAM_BOT_TOKEN": "@telegram_bot_token",
-    "TELEGRAM_CHAT_ID": "@telegram_chat_id"
-  }
+
 }
