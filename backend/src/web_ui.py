@@ -234,7 +234,8 @@ def get_price(symbol):
         else:
             price = bot.get_current_price(symbol)
         
-        return jsonify({'success': True, 'price': price})
+        # Return price as float (not string) for proper JSON handling
+        return jsonify({'success': True, 'price': float(price)})
     except Exception as e:
         logger.error(f"Price error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500

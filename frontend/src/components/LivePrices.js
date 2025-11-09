@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, TrendingUp, TrendingDown } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function LivePrices() {
   const [prices, setPrices] = useState({
@@ -13,8 +14,8 @@ export default function LivePrices() {
     const updatePrices = async () => {
       try {
         const [btcRes, ethRes] = await Promise.all([
-          fetch('/api/price/BTCUSDT').then(r => r.json()),
-          fetch('/api/price/ETHUSDT').then(r => r.json())
+          fetch(`${API_URL}/api/price/BTCUSDT`).then(r => r.json()),
+          fetch(`${API_URL}/api/price/ETHUSDT`).then(r => r.json())
         ]);
 
         if (btcRes.success && ethRes.success) {
