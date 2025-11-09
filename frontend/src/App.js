@@ -20,20 +20,35 @@ function App() {
 
   const handleConnect = async (apiKey, apiSecret) => {
     try {
-      const response = await axios.post(`${API_URL}/api/connect`, {
-        api_key: apiKey,
-        api_secret: apiSecret
-      });
+      // Get JWT token from localStorage
+      const token = localStorage.getItem('access_token');
+      
+      if (!token) {
+        console.error('No authentication token found');
+        return;
+      }
+
+      const response = await axios.post(`${API_URL}/api/connect`, 
+        {
+          api_key: apiKey,
+          api_secret: apiSecret
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
       
       if (response.data.success) {
         setConnected(true);
         setBalance(response.data.balance);
         updatePrices();
       } else {
-        alert('Connection failed: ' + response.data.message);
+        console.error('Connection failed:', response.data.message);
       }
     } catch (error) {
-      alert('Error: ' + error.message);
+      console.error('Connection error:', error.response?.data?.message || error.message);
     }
   };
 
@@ -43,9 +58,15 @@ function App() {
     if (savedUser) {
       const userData = JSON.parse(savedUser);
       setUser(userData);
-      // Auto-connect if credentials exist
-      if (userData.apiKey && userData.apiSecret) {
-        handleConnect(userData.apiKey, userData.apiSecret);
+      // Auto-connect if credentials exist (check both camelCase and snake_case)
+      const apiKey = userData.api_key || userData.apiKey;
+      const apiSecret = userData.api_secret || userData.apiSecret;
+      
+      if (apiKey && apiSecret) {
+        console.log('Auto-connecting with stored credentials...');
+        handleConnect(apiKey, apiSecret);
+      } else {
+        console.log('No API credentials found for user');
       }
     }
     // eslint-disable-next-line
@@ -211,7 +232,7 @@ function App() {
             {!connected && (
               <div className="mb-6 bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4">
                 <p className="text-yellow-400 text-center">
-                  ⚠️ Not connected to Binance. {user.apiKey ? 'Connecting...' : 'Please add API credentials in your profile.'}
+                  ⚠️ Not connected to Binance. {(user.api_key || user.apiKey) ? 'Connecting...' : 'Please add API credentials in your profile.'}
                 </p>
               </div>
             )}
