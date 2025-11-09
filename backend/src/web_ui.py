@@ -239,19 +239,23 @@ def connect():
 
 @app.route('/api/price/<symbol>')
 def get_price(symbol):
-    """Get current price (public endpoint)"""
+    """Get current price (public endpoint - no auth required)"""
     try:
-        if not bot:
-            # Create temporary bot for price checking
-            temp_bot = MarketOrderBot(testnet=True)
-            price = temp_bot.get_current_price(symbol)
-        else:
-            price = bot.get_current_price(symbol)
+        # Use public Binance client for price data (no API key needed)
+        from binance.client import Client
         
-        # Return price as float (not string) for proper JSON handling
-        return jsonify({'success': True, 'price': float(price)})
+        # Create client without credentials for public endpoints
+        public_client = Client("", "", testnet=True)
+        
+        # Get ticker price (public endpoint)
+        ticker = public_client.futures_symbol_ticker(symbol=symbol)
+        price = float(ticker['price'])
+        
+        logger.info(f"Fetched price for {symbol}: {price}")
+        
+        return jsonify({'success': True, 'price': price})
     except Exception as e:
-        logger.error(f"Price error: {e}")
+        logger.error(f"Price error for {symbol}: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/api/market_order', methods=['POST'])
