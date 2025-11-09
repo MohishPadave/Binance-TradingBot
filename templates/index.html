@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Futures Trading Bot</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Binance Futures Trading Bot</h1>
+            <p class="subtitle">USDT-M Testnet</p>
+        </header>
+
+        <!-- Connection Section -->
+        <div class="card" id="connection-card">
+            <h2>🔐 Connect to Binance</h2>
+            <div class="form-group">
+                <label>API Key:</label>
+                <input type="text" id="api-key" placeholder="Enter your API key" value="QN6mQ5PxWbZhZ8h7UBYiwnvpZqAfbwAQ4h8pozxtXgTkkpqfWnkGJNdYD1uhz9in">
+            </div>
+            <div class="form-group">
+                <label>API Secret:</label>
+                <input type="password" id="api-secret" placeholder="Enter your API secret" value="uqU8sqEe8hldYXWSYtv4mwHYLG59dFtUvpH5hdne4ohWqnMOy1ETQjQiDrxeIz86">
+            </div>
+            <button onclick="connect()" class="btn btn-primary">Connect</button>
+            <div id="connection-status"></div>
+        </div>
+
+        <!-- Trading Section (Hidden until connected) -->
+        <div id="trading-section" style="display: none;">
+            
+            <!-- Account Info -->
+            <div class="card">
+                <h2>💰 Account Balance</h2>
+                <div class="balance-display">
+                    <span id="balance">0.00</span> USDT
+                </div>
+            </div>
+
+            <!-- Price Checker -->
+            <div class="card">
+                <h2>📊 Current Prices</h2>
+                <div class="price-grid">
+                    <div class="price-item">
+                        <span class="symbol">BTCUSDT</span>
+                        <span class="price" id="btc-price">-</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="symbol">ETHUSDT</span>
+                        <span class="price" id="eth-price">-</span>
+                    </div>
+                </div>
+                <button onclick="updatePrices()" class="btn btn-secondary">Refresh Prices</button>
+            </div>
+
+            <!-- Order Tabs -->
+            <div class="card">
+                <h2>📈 Place Orders</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTab('market')">Market</button>
+                    <button class="tab-btn" onclick="showTab('limit')">Limit</button>
+                    <button class="tab-btn" onclick="showTab('stop-limit')">Stop-Limit</button>
+                    <button class="tab-btn" onclick="showTab('oco')">OCO</button>
+                    <button class="tab-btn" onclick="showTab('twap')">TWAP</button>
+                    <button class="tab-btn" onclick="showTab('grid')">Grid</button>
+                </div>
+
+                <!-- Market Order -->
+                <div id="market-tab" class="tab-content active">
+                    <h3>Market Order</h3>
+                    <div class="form-group">
+                        <label>Symbol:</label>
+                        <input type="text" id="market-symbol" value="BTCUSDT">
+                    </div>
+                    <div class="form-group">
+                        <label>Side:</label>
+                        <select id="market-side">
+                            <option value="BUY">BUY</option>
+                            <option value="SELL">SELL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="market-quantity" value="0.001" step="0.001">
+                    </div>
+                    <button onclick="placeMarketOrder()" class="btn btn-success">Place Market Order</button>
+                </div>
+
+                <!-- Limit Order -->
+                <div id="limit-tab" class="tab-content">
+                    <h3>Limit Order</h3>
+                    <div class="form-group">
+                        <label>Symbol:</label>
+                        <input type="text" id="limit-symbol" value="BTCUSDT">
+                    </div>
+                    <div class="form-group">
+                        <label>Side:</label>
+                        <select id="limit-side">
+                            <option value="BUY">BUY</option>
+                            <option value="SELL">SELL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="limit-quantity" value="0.001" step="0.001">
+                    </div>
+                    <div class="form-group">
+                        <label>Price:</label>
+                        <input type="number" id="limit-price" value="100000" step="0.01">
+                    </div>
+                    <button onclick="placeLimitOrder()" class="btn btn-success">Place Limit Order</button>
+                </div>
+
+                <!-- Stop-Limit Order -->
+                <div id="stop-limit-tab" class="tab-content">
+                    <h3>Stop-Limit Order</h3>
+                    <div class="form-group">
+                        <label>Symbol:</label>
+                        <input type="text" id="sl-symbol" value="BTCUSDT">
+                    </div>
+                    <div class="form-group">
+                        <label>Side:</label>
+                        <select id="sl-side">
+                            <option value="BUY">BUY</option>
+                            <option value="SELL">SELL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="sl-quantity" value="0.001" step="0.001">
+                    </div>
+                    <div class="form-group">
+                        <label>Stop Price:</label>
+                        <input type="number" id="sl-stop-price" value="105000" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Limit Price:</label>
+                        <input type="number" id="sl-limit-price" value="105100" step="0.01">
+                    </div>
+                    <button onclick="placeStopLimitOrder()" class="btn btn-success">Place Stop-Limit Order</button>
+                </div>
+
+                <!-- OCO Order -->
+                <div id="oco-tab" class="tab-content">
+                    <h3>OCO Order (Take Profit + Stop Loss)</h3>
+                    <div class="form-group">
+                        <label>Symbol:</label>
+                        <input type="text" id="oco-symbol" value="BTCUSDT">
+                    </div>
+                    <div class="form-group">
+                        <label>Side:</label>
+                        <select id="oco-side">
+                            <option value="SELL">SELL</option>
+                            <option value="BUY">BUY</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="oco-quantity" value="0.001" step="0.001">
+                    </div>
+                    <div class="form-group">
+                        <label>Take Profit Price:</label>
+                        <input type="number" id="oco-tp-price" value="110000" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Stop Loss Price:</label>
+                        <input type="number" id="oco-sl-price" value="95000" step="0.01">
+                    </div>
+                    <button onclick="placeOCOOrder()" class="btn btn-success">Place OCO Order</button>
+                </div>
+
+                <!-- TWAP Order -->
+                <div id="twap-tab" class="tab-content">
+                    <h3>TWAP Order</h3>
+                    <div class="form-group">
+                        <label>Symbol:</label>
+                        <input type="text" id="twap-symbol" value="BTCUSDT">
+                    </div>
+                    <div class="form-group">
+                        <label>Side:</label>
+                        <select id="twap-side">
+                            <option value="BUY">BUY</option>
+                            <option value="SELL">SELL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Quantity:</label>
+                        <input type="number" id="twap-quantity" value="0.01" step="0.001">
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Orders:</label>
+                        <input type="number" id="twap-num-orders" value="5" min="2">
+                    </div>
+                    <div class="form-group">
+                        <label>Interval (seconds):</label>
+                        <input type="number" id="twap-interval" value="10" min="1">
+                    </div>
+                    <button onclick="placeTWAPOrder()" class="btn btn-success">Execute TWAP</button>
+                </div>
+
+                <!-- Grid Trading -->
+                <div id="grid-tab" class="tab-content">
+                    <h3>Grid Trading</h3>
+                    <div class="form-group">
+                        <label>Symbol:</label>
+                        <input type="text" id="grid-symbol" value="BTCUSDT">
+                    </div>
+                    <div class="form-group">
+                        <label>Lower Price:</label>
+                        <input type="number" id="grid-lower" value="95000" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Upper Price:</label>
+                        <input type="number" id="grid-upper" value="105000" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Grids:</label>
+                        <input type="number" id="grid-num" value="10" min="2">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity per Grid:</label>
+                        <input type="number" id="grid-quantity" value="0.001" step="0.001">
+                    </div>
+                    <button onclick="placeGridOrder()" class="btn btn-success">Setup Grid</button>
+                </div>
+            </div>
+
+            <!-- Open Orders -->
+            <div class="card">
+                <h2>📋 Open Orders</h2>
+                <button onclick="loadOpenOrders()" class="btn btn-secondary">Refresh Orders</button>
+                <div id="orders-list"></div>
+            </div>
+
+            <!-- Status Messages -->
+            <div class="card">
+                <h2>📢 Status</h2>
+                <div id="status-messages"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
