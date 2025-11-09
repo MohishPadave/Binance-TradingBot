@@ -1,13 +1,15 @@
 """
-Vercel serverless function entry point
+Vercel serverless function for Binance Trading Bot API
 """
 import sys
 import os
 
-# Add src to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# Add parent directory to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from web_ui import app
+# Import Flask app
+from src.web_ui import app
 
-# Export for Vercel
-handler = app
+# Vercel handler
+def handler(request, response):
+    return app(request, response)
