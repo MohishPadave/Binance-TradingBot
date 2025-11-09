@@ -162,7 +162,7 @@ export default function AuthPage({ onAuth }) {
                 <input
                   type="password"
                   name="password"
-                  value={formData.email}
+                  value={formData.password}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   placeholder="••••••••"
