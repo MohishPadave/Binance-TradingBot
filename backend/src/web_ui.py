@@ -41,6 +41,9 @@ frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
 # Function to check if origin is allowed
 def is_allowed_origin(origin):
+    if not origin:
+        return False
+    
     allowed_patterns = [
         "http://localhost:3000",
         "http://localhost:3001",
@@ -49,12 +52,15 @@ def is_allowed_origin(origin):
     
     # Check exact matches
     if origin in allowed_patterns:
+        logger.info(f"CORS: Allowed origin (exact match): {origin}")
         return True
     
     # Check if it's a Vercel deployment
-    if origin and origin.endswith('.vercel.app'):
+    if origin.endswith('.vercel.app'):
+        logger.info(f"CORS: Allowed origin (Vercel): {origin}")
         return True
     
+    logger.warning(f"CORS: Blocked origin: {origin}")
     return False
 
 # Configure CORS with custom origin checker
