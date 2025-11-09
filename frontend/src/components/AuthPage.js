@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, User, Mail, Key, TrendingUp } from 'lucide-react';
+import axios from 'axios';
+import { API_URL } from '../config';
 
 export default function AuthPage({ onAuth }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,48 +13,57 @@ export default function AuthPage({ onAuth }) {
     apiSecret: ''
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
-    // Simulate authentication
-    setTimeout(() => {
+    try {
       if (isLogin) {
-        // Check if user exists in localStorage
-        const users = JSON.parse(localStorage.getItem('tradingBotUsers') || '{}');
-        const user = users[formData.email];
+        // Login with backend API
+        const response = await axios.post(`${API_URL}/api/auth/login`, {
+          email: formData.email,
+          password: formData.password
+        });
         
-        if (user && user.password === formData.password) {
-          onAuth(user);
-        } else {
-          alert('Invalid credentials. Try signing up first!');
-          setLoading(false);
+        if (response.data.success) {
+          // Store token and user data
+          localStorage.setItem('access_token', response.data.access_token);
+          localStorage.setItem('refresh_token', response.data.refresh_token);
+          
+          const userData = {
+            ...response.data.user,
+            token: response.data.access_token
+          };
+          
+          localStorage.setItem('tradingBotUser', JSON.stringify(userData));
+          onAuth(userData);
         }
       } else {
-        // Sign up
-        const users = JSON.parse(localStorage.getItem('tradingBotUsers') || '{}');
-        
-        if (users[formData.email]) {
-          alert('Email already exists. Please login.');
-          setLoading(false);
-          return;
-        }
-
-        const newUser = {
+        // Register with backend API
+        const response = await axios.post(`${API_URL}/api/auth/register`, {
           email: formData.email,
           password: formData.password,
           name: formData.name,
-          apiKey: formData.apiKey,
-          apiSecret: formData.apiSecret,
-          createdAt: new Date().toISOString()
-        };
+          api_key: formData.apiKey,
+          api_secret: formData.apiSecret
+        });
 
-        users[formData.email] = newUser;
-        localStorage.setItem('tradingBotUsers', JSON.stringify(users));
-        onAuth(newUser);
+        if (response.data.success) {
+          alert('✅ Registration successful! Please login.');
+          setIsLogin(true);
+          setFormData({ ...formData, password: '' });
+        }
       }
-    }, 1000);
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || 'An error occurred';
+      setError(errorMessage);
+      alert('❌ ' + errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -96,6 +107,12 @@ export default function AuthPage({ onAuth }) {
               Sign Up
             </button>
           </div>
+
+          {error && (
+            <div className="mb-4 bg-red-500/20 border border-red-500/30 rounded-lg p-3">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
@@ -145,13 +162,17 @@ export default function AuthPage({ onAuth }) {
                 <input
                   type="password"
                   name="password"
-                  value={formData.password}
+                  value={formData.email}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   placeholder="••••••••"
                   required
+                  minLength={8}
                 />
               </div>
+              {!isLogin && (
+                <p className="text-xs text-gray-400 mt-1">Minimum 8 characters, include uppercase, lowercase, and number</p>
+              )}
             </div>
 
             {!isLogin && (
@@ -214,15 +235,15 @@ export default function AuthPage({ onAuth }) {
 
           <div className="mt-6 pt-6 border-t border-white/10">
             <p className="text-xs text-gray-400 text-center">
-              🔒 Your credentials are stored locally and securely
+              🔒 Secured with MongoDB & JWT Authentication
             </p>
           </div>
         </div>
 
-        {/* Demo Credentials */}
+        {/* Info */}
         <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
           <p className="text-xs text-blue-400 text-center">
-            💡 Demo: Use any email/password to sign up, or login with existing account
+            💡 Create an account to start trading. API credentials are optional and can be added later in your profile.
           </p>
         </div>
       </div>
