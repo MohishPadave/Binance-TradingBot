@@ -4,60 +4,61 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 venv/
+env/
 ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
+dist/
+build/
+
+# Environment variables
+.env
+backend/.env
+backend/src/.env
 
 # Logs
 *.log
 bot.log
-order_history.json
-
-# Environment
-.env
-.venv
-.env.local
-.env.production
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
 
-# API Keys (NEVER COMMIT)
-config_local.py
-credentials.json
-
-# Node
+# Node.js (Frontend)
 node_modules/
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# React
-frontend/build/
-frontend/.env.local
-frontend/.env.production
+# MongoDB
+*.mongodb
 
-# Vercel
+# SSL Certificates
+*.pem
+*.key
+*.crt
+backend/cert.pem
+backend/key.pem
+
+# Order history
+order_history.json
+
+# Test files
+test_*.py
+
+# Deployment
 .vercel
+*.zip

@@ -1,3 +1,0 @@
-"""
-Advanced order types module
-"""
