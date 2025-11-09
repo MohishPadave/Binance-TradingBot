@@ -38,14 +38,28 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 # Initialize extensions
 # CORS configuration - allow frontend domains
 frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
-allowed_origins = [
-    "http://localhost:3000",  # Local development
-    "https://*.vercel.app",   # Vercel deployments
-    frontend_url,             # Production frontend from env
-]
 
+# Function to check if origin is allowed
+def is_allowed_origin(origin):
+    allowed_patterns = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        frontend_url,
+    ]
+    
+    # Check exact matches
+    if origin in allowed_patterns:
+        return True
+    
+    # Check if it's a Vercel deployment
+    if origin and origin.endswith('.vercel.app'):
+        return True
+    
+    return False
+
+# Configure CORS with custom origin checker
 CORS(app, 
-     origins=allowed_origins,
+     origins=is_allowed_origin,
      supports_credentials=True,
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
