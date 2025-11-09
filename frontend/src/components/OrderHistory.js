@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { History, RefreshCw, TrendingUp, TrendingDown } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function OrderHistory() {
   const [history, setHistory] = useState([]);
@@ -9,7 +10,7 @@ export default function OrderHistory() {
   const loadHistory = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/order_history?limit=10');
+      const response = await axios.get(`${API_URL}/api/order_history?limit=10`);
       if (response.data.success) {
         setHistory(response.data.history);
       }

@@ -9,6 +9,7 @@ import BlogPage from './components/BlogPage';
 import OrderHistory from './components/OrderHistory';
 import TelegramSettings from './components/TelegramSettings';
 import LivePrices from './components/LivePrices';
+import { API_URL } from './config';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -19,7 +20,7 @@ function App() {
 
   const handleConnect = async (apiKey, apiSecret) => {
     try {
-      const response = await axios.post('/api/connect', {
+      const response = await axios.post(`${API_URL}/api/connect`, {
         api_key: apiKey,
         api_secret: apiSecret
       });
@@ -68,8 +69,8 @@ function App() {
   const updatePrices = async () => {
     try {
       const [btcRes, ethRes] = await Promise.all([
-        axios.get('/api/price/BTCUSDT'),
-        axios.get('/api/price/ETHUSDT')
+        axios.get(`${API_URL}/api/price/BTCUSDT`),
+        axios.get(`${API_URL}/api/price/ETHUSDT`)
       ]);
       
       if (btcRes.data.success && ethRes.data.success) {

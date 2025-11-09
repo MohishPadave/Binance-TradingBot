@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RefreshCw, X } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function OpenOrders() {
   const [orders, setOrders] = useState([]);
@@ -9,7 +10,7 @@ export default function OpenOrders() {
   const loadOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/open_orders');
+      const response = await axios.get(`${API_URL}/api/open_orders`);
       if (response.data.success) {
         setOrders(response.data.orders);
       }
@@ -24,7 +25,7 @@ export default function OpenOrders() {
     if (!window.confirm('Cancel this order?')) return;
     
     try {
-      const response = await axios.post('/api/cancel_order', {
+      const response = await axios.post(`${API_URL}/api/cancel_order`, {
         symbol,
         order_id: orderId
       });

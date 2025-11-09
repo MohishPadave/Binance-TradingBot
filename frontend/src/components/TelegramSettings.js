@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Send, Settings, CheckCircle } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function TelegramSettings() {
   const [botToken, setBotToken] = useState('');
@@ -11,7 +12,7 @@ export default function TelegramSettings() {
   const handleConfigure = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('/api/telegram/config', {
+      const response = await axios.post(`${API_URL}/api/telegram/config`, {
         bot_token: botToken,
         chat_id: chatId
       });
@@ -31,7 +32,7 @@ export default function TelegramSettings() {
 
   const handleTest = async () => {
     try {
-      const response = await axios.post('/api/telegram/test');
+      const response = await axios.post(`${API_URL}/api/telegram/test`);
       if (response.data.success) {
         alert('✅ Test message sent! Check your Telegram.');
       } else {

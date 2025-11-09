@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ShoppingCart, TrendingUp, Shield, Zap, Grid3x3, Clock } from 'lucide-react';
+import { API_URL } from '../config';
 
 const tabs = [
   { id: 'market', name: 'Market', icon: ShoppingCart },
@@ -27,7 +28,7 @@ export default function OrderPanel() {
     const formData = new FormData(e.target);
     
     try {
-      const response = await axios.post('/api/market_order', {
+      const response = await axios.post(`${API_URL}/api/market_order`, {
         symbol: formData.get('symbol'),
         side: formData.get('side'),
         quantity: formData.get('quantity')
@@ -52,7 +53,7 @@ export default function OrderPanel() {
     const formData = new FormData(e.target);
     
     try {
-      const response = await axios.post('/api/limit_order', {
+      const response = await axios.post(`${API_URL}/api/limit_order`, {
         symbol: formData.get('symbol'),
         side: formData.get('side'),
         quantity: formData.get('quantity'),
@@ -78,7 +79,7 @@ export default function OrderPanel() {
     const formData = new FormData(e.target);
     
     try {
-      const response = await axios.post('/api/stop_limit_order', {
+      const response = await axios.post(`${API_URL}/api/stop_limit_order`, {
         symbol: formData.get('symbol'),
         side: formData.get('side'),
         quantity: formData.get('quantity'),
@@ -105,7 +106,7 @@ export default function OrderPanel() {
     const formData = new FormData(e.target);
     
     try {
-      const response = await axios.post('/api/oco_order', {
+      const response = await axios.post(`${API_URL}/api/oco_order`, {
         symbol: formData.get('symbol'),
         side: formData.get('side'),
         quantity: formData.get('quantity'),
@@ -134,7 +135,7 @@ export default function OrderPanel() {
     showMessage('⏳ Executing TWAP... This will take some time.', 'info');
     
     try {
-      const response = await axios.post('/api/twap_order', {
+      const response = await axios.post(`${API_URL}/api/twap_order`, {
         symbol: formData.get('symbol'),
         side: formData.get('side'),
         quantity: formData.get('quantity'),
@@ -161,7 +162,7 @@ export default function OrderPanel() {
     const formData = new FormData(e.target);
     
     try {
-      const response = await axios.post('/api/grid_order', {
+      const response = await axios.post(`${API_URL}/api/grid_order`, {
         symbol: formData.get('symbol'),
         lower_price: formData.get('lower_price'),
         upper_price: formData.get('upper_price'),
