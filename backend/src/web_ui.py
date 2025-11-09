@@ -241,19 +241,30 @@ def connect():
 def get_price(symbol):
     """Get current price (public endpoint - no auth required)"""
     try:
-        # Use public Binance client for price data (no API key needed)
-        from binance.client import Client
+        import requests
         
-        # Create client without credentials for public endpoints
-        public_client = Client("", "", testnet=True)
+        # Use production Binance API for price data (more reliable than testnet)
+        # This is public data and doesn't require authentication
+        url = f"https://fapi.binance.com/fapi/v1/ticker/price?symbol={symbol}"
         
-        # Get ticker price (public endpoint)
-        ticker = public_client.futures_symbol_ticker(symbol=symbol)
-        price = float(ticker['price'])
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        
+        data = response.json()
+        price = float(data['price'])
         
         logger.info(f"Fetched price for {symbol}: {price}")
         
         return jsonify({'success': True, 'price': price})
+    except requests.exceptions.Timeout:
+        logger.error(f"Timeout fetching price for {symbol}")
+        return jsonify({'success': False, 'message': 'Request timeout'}), 504
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Network error fetching price for {symbol}: {e}")
+        return jsonify({'success': False, 'message': f'Network error: {str(e)}'}), 500
+    except KeyError:
+        logger.error(f"Invalid symbol: {symbol}")
+        return jsonify({'success': False, 'message': 'Invalid symbol'}), 400
     except Exception as e:
         logger.error(f"Price error for {symbol}: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
