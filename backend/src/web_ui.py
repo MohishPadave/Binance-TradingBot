@@ -36,7 +36,17 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
 # Initialize extensions
-CORS(app, origins=["*"])  # Configure for production
+# CORS configuration - allow frontend domains
+CORS(app, 
+     origins=[
+         "http://localhost:3000",  # Local development
+         "https://*.vercel.app",   # Vercel deployments
+         "https://binance-tradingbot-production.up.railway.app",  # Backend itself
+     ],
+     supports_credentials=True,
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+)
 jwt = JWTManager(app)
 email_service.init_app(app)
 
